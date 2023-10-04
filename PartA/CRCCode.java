@@ -1,3 +1,5 @@
+//Write a program for error detecting code using CRC-CCITT(16-bits)
+//takes in data word as input which is encoded to code word with the help of a key and a received code word is given as input which is detected to be erroneous or not 
 import java.util.Scanner;
 
 public class CRCCode {
