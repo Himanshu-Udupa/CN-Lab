@@ -39,9 +39,10 @@ public class BellmanFord {
            N = sc.nextInt(); 
            System.out.println("Enter the Weight Matrix of Graph"); 
            graph = new int[N][N]; 
-           for (int i = 0; i < N; i++) 
+           for (int i = 0; i < N; i++) {
              for (int j = 0; j < N; j++) 
                 graph[i][j] = sc.nextInt(); 
+           }
                System.out.print("Enter the Source Vertex : "); 
                int source = sc.nextInt(); 
               bellmanFord(source - 1); 
