@@ -1,61 +1,53 @@
-//Leaky bucket algorithm
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.math.BigInteger;
-import java.nio.charset.StandardCharsets;
-import java.util.Random;
+//leaky bucket algorithm
+import java.util.Scanner;
 
-public class RSA{
-    private BigInteger p, q, N, phi, e, d;
-    private int bitLength = 1024;
-    private Random r;
-
-    public RSA() {
-        r = new Random();
-        p = BigInteger.probablePrime(bitLength, r);
-        q = BigInteger.probablePrime(bitLength, r);
-        System.out.println("Prime number p is " + p);
-        System.out.println("Prime number q is " + q);
-        N = p.multiply(q);
-        phi = p.subtract(BigInteger.ONE).multiply(q.subtract(BigInteger.ONE));
-        e = BigInteger.probablePrime(bitLength / 2, r);
-
-        while (phi.gcd(e).compareTo(BigInteger.ONE) > 0 && e.compareTo(phi) < 0) {
-            e = e.add(BigInteger.ONE);
+public class Main {
+    public static void main(String args[]) {
+        Scanner in = new Scanner(System.in);
+        int bucket_remaining = 0, sent, received;
+        System.out.println("Enter the bucket capacity");
+        int bucket_capacity = in.nextInt();
+        System.out.println("Enter the bucket rate (Rate at which the bucket sends the packets)");
+        int bucket_rate = in.nextInt();
+        System.out.println("Enter the number of packets to be sent");
+        int n = in.nextInt();
+        int[] buf = new int[30]; // buffer array to store the packets
+        System.out.println("Enter the packets sizes one by one");
+        for (int i = 0; i < n; i++) {
+            buf[i] = in.nextInt();
         }
 
-        System.out.println("Public key is " + e);
-        d = e.modInverse(phi);
-        System.out.println("Private key is " + d);
-    }
+        System.out.println(String.format("%s\t%s\t%s\t%s\t%s","TimeΔt","P_size","accepted","sent","remaining"));
 
-    public static void main(String[] args) throws IOException {
-        RSA rsa = new RSA();
-        BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
-        System.out.println("Enter the plain text: ");
-        String testString = br.readLine();
-        System.out.println("Encrypting string: " + testString);
-        System.out.println("String in bytes: " + bytesToString(testString.getBytes()));
-        byte[] encrypted = rsa.encrypt(testString.getBytes());
-        byte[] decrypted = rsa.decrypt(encrypted);
-        System.out.println("Decrypting Bytes: " + bytesToString(decrypted));
-        System.out.println("Decrypted string: " + new String(decrypted, StandardCharsets.UTF_8));
-    }
+        for (int i = 0; i < n; i++) {
+            if (buf[i] != 0) {
+                if (bucket_remaining + buf[i] > bucket_capacity) {
+                    received = -1;
+                } else {
+                    received = buf[i];
+                    bucket_remaining += buf[i];
+                }
+            } else {
+                received = 0;
+            }
 
-    private static String bytesToString(byte[] encrypted) {
-        StringBuilder result = new StringBuilder();
-        for (byte b : encrypted) {
-            result.append(Byte.toString(b));
+            if (bucket_remaining != 0) {
+                if (bucket_remaining < bucket_rate) {
+                    sent = bucket_remaining;
+                    bucket_remaining = 0;
+                } else {
+                    sent = bucket_rate;
+                    bucket_remaining = bucket_remaining - bucket_rate;
+                }
+            } else {
+                sent = 0;
+            }
+
+            if (received == -1) {
+                System.out.println(String.format("%d\t%d\t%s\t%d\t%d", i + 1, buf[i], "dropped", sent, bucket_remaining));
+            } else {
+                System.out.println(String.format("%d\t%d\t%d\t%d\t%d", i + 1, buf[i], received, sent, bucket_remaining));
+            }
         }
-        return result.toString();
-    }
-
-    public byte[] encrypt(byte[] message) {
-        return (new BigInteger(message)).modPow(e, N).toByteArray();
-    }
-
-    public byte[] decrypt(byte[] message) {
-        return (new BigInteger(message)).modPow(d, N).toByteArray();
     }
 }
