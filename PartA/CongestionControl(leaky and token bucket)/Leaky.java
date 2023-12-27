@@ -1,7 +1,7 @@
 //leaky bucket algorithm
 import java.util.Scanner;
 
-public class Main {
+public class Leaky {
     public static void main(String args[]) {
         Scanner in = new Scanner(System.in);
         int bucket_remaining = 0, sent, received;
@@ -13,12 +13,9 @@ public class Main {
         int n = in.nextInt();
         int[] buf = new int[30]; // buffer array to store the packets
         System.out.println("Enter the packets sizes one by one");
-        for (int i = 0; i < n; i++) {
+        for (int i = 0; i < n; i++) 
             buf[i] = in.nextInt();
-        }
-
         System.out.println(String.format("%s\t%s\t%s\t%s\t%s","TimeΔt","P_size","accepted","sent","remaining"));
-
         for (int i = 0; i < n; i++) {
             if (buf[i] != 0) {
                 if (bucket_remaining + buf[i] > bucket_capacity) {
@@ -27,10 +24,7 @@ public class Main {
                     received = buf[i];
                     bucket_remaining += buf[i];
                 }
-            } else {
-                received = 0;
-            }
-
+            } else received = 0;
             if (bucket_remaining != 0) {
                 if (bucket_remaining < bucket_rate) {
                     sent = bucket_remaining;
@@ -39,15 +33,11 @@ public class Main {
                     sent = bucket_rate;
                     bucket_remaining = bucket_remaining - bucket_rate;
                 }
-            } else {
-                sent = 0;
-            }
-
-            if (received == -1) {
+            } else sent = 0;
+            if (received == -1) 
                 System.out.println(String.format("%d\t%d\t%s\t%d\t%d", i + 1, buf[i], "dropped", sent, bucket_remaining));
-            } else {
+            else 
                 System.out.println(String.format("%d\t%d\t%d\t%d\t%d", i + 1, buf[i], received, sent, bucket_remaining));
-            }
         }
     }
 }
