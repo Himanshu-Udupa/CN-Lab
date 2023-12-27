@@ -46,7 +46,6 @@ public class CRC1 {
                 valid = false;
                 break;
             }
-
         if (valid)
             System.out.println("Data stream is valid");
         else
